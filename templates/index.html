@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MailSécure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F6F3;--card:#fff;--border:#E4E2DC;
+  --text:#18180F;--muted:#6A6960;--soft:#9B9890;
+  --accent:#2D6A4F;--accent-light:#E8F4EE;--accent-mid:#52B788;
+  --warn:#C4520A;--warn-light:#FEF0E7;
+  --info:#185FA5;--info-light:#EAF1FB;
+  --danger:#A32D2D;--danger-light:#FCEBEB;
+  --radius:10px;
+}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+.logo-dot{width:26px;height:26px;background:var(--accent);border-radius:7px;display:grid;place-items:center}
+.logo-dot svg{width:14px;height:14px;fill:white}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.email-badge{display:flex;align-items:center;gap:6px;background:var(--accent-light);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--accent);font-weight:500}
+.btn-sm{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:white;font-size:12px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-sm:hover{background:var(--bg)}
+.btn-danger-sm{border-color:#F0A0A0;color:var(--danger);background:var(--danger-light)}
+.btn-danger-sm:hover{background:#f9d8d8}
+
+/* ── NAV ── */
+.nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto}
+.nav-btn{padding:11px 16px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);border:none;background:transparent;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .15s}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{color:var(--accent);font-weight:500;border-bottom-color:var(--accent)}
+.badge{display:inline-block;background:var(--danger);color:white;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:500}
+
+/* ── LAYOUT ── */
+.main{padding:20px 24px;max-width:940px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.section{display:none}
+.section.visible{display:flex;flex-direction:column;gap:14px}
+
+/* ── LOGIN ── */
+.login-wrap{min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:420px}
+.login-title{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
+.form-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white}
+.form-input:focus{outline:2px solid var(--accent-mid);border-color:transparent}
+.btn-primary{width:100%;padding:11px;border-radius:8px;background:var(--accent);border:none;color:white;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer}
+.btn-primary:hover{background:#245740}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.info-box{background:var(--info-light);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--info);line-height:1.6;margin-bottom:16px}
+.info-box a{color:var(--info);font-weight:500}
+.err-msg{background:var(--danger-light);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--danger);margin-top:10px;display:none}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-header{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-title{font-family:'Syne',sans-serif;font-weight:600;font-size:14px}
+.card-count{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--muted);white-space:nowrap}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.stat-label{font-size:11px;color:var(--soft);margin-bottom:3px}
+.stat-value{font-size:24px;font-family:'Syne',sans-serif;font-weight:700}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── FILTER CHIPS ── */
+.filter-bar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:white;font-size:11px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .1s}
+.chip:hover{border-color:#aaa;color:var(--text)}
+.chip.active{background:var(--text);color:white;border-color:var(--text)}
+
+/* ── COMPANY LIST ── */
+.company-row{padding:11px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);transition:background .1s}
+.company-row:last-child{border-bottom:none}
+.company-row:hover{background:var(--bg)}
+.avatar{width:33px;height:33px;border-radius:8px;background:var(--accent-light);display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--accent);flex-shrink:0}
+.company-info{flex:1;min-width:0}
+.company-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.company-sub{font-size:11px;color:var(--muted)}
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+.tag-leak{background:var(--danger-light);color:var(--danger)}
+.tag-email{background:var(--info-light);color:var(--info)}
+.btn-action{padding:5px 10px;border-radius:6px;border:1px solid var(--accent);background:var(--accent-light);font-size:11px;font-weight:500;color:var(--accent);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-action:hover{background:var(--accent);color:white}
+
+/* ── MAIL LIST ── */
+.search-wrap{padding:10px 16px;border-bottom:1px solid var(--border)}
+.search-wrap input{width:100%;padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg)}
+.search-wrap input:focus{outline:2px solid var(--accent-mid);border-color:transparent}
+
+.action-bar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.action-bar-info{font-size:13px;color:var(--muted)}
+.action-bar-info strong{color:var(--text);font-weight:500}
+.action-bar-btns{display:flex;gap:7px;flex-wrap:wrap}
+.btn-outline{padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:white;font-size:12px;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-outline:hover{background:var(--bg)}
+.btn-delete{padding:7px 14px;border-radius:7px;background:var(--danger);border:none;color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-delete:hover{background:#881f1f}
+.btn-delete:disabled{opacity:.35;cursor:not-allowed}
+
+.mail-row{padding:9px 16px;display:flex;align-items:flex-start;gap:9px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.mail-row:hover{background:var(--bg)}
+.mail-row.selected{background:#EFF8F2}
+.mail-row:last-child{border-bottom:none}
+.check{width:15px;height:15px;border:1.5px solid #ccc;border-radius:4px;flex-shrink:0;margin-top:1px;display:grid;place-items:center;font-size:9px;color:white}
+.check.on{background:var(--accent);border-color:var(--accent)}
+.cat-pill{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;flex-shrink:0;margin-top:2px;white-space:nowrap}
+.cat-newsletter{background:#E8F4EE;color:var(--accent)}
+.cat-spam{background:var(--danger-light);color:var(--danger)}
+.cat-important{background:var(--info-light);color:var(--info)}
+.cat-autre{background:#F1EFE8;color:var(--muted)}
+.mail-meta{flex:1;min-width:0}
+.mail-from{font-weight:500;font-size:12px}
+.mail-subj{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mail-date{font-size:10px;color:var(--soft);white-space:nowrap}
+
+/* ── HISTORY ── */
+.history-row{padding:11px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.history-row:last-child{border-bottom:none}
+.hdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hdot-sent{background:var(--accent-mid)}
+.hdot-waiting{background:#EF9F27}
+.status-pill{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.st-ok{background:var(--accent-light);color:var(--accent)}
+.st-wait{background:var(--warn-light);color:var(--warn)}
+
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:white;border-radius:14px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.modal-sm{max-width:380px}
+.modal-md{max-width:520px}
+.modal-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Syne',sans-serif;font-weight:600;font-size:14px}
+.btn-close{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:white;cursor:pointer;font-size:14px;color:var(--muted);display:grid;place-items:center}
+.btn-close:hover{background:var(--bg)}
+.modal-body{padding:18px}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.form-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);resize:vertical;min-height:160px;line-height:1.6}
+.form-textarea:focus{outline:2px solid var(--accent-mid);border-color:transparent}
+.rgpd-note{background:var(--accent-light);border-radius:7px;padding:10px 12px;font-size:11px;color:var(--accent);line-height:1.6;margin-bottom:14px}
+.confirm-icon{width:44px;height:44px;border-radius:50%;background:var(--danger-light);margin:0 auto 12px;display:grid;place-items:center;font-size:20px}
+.confirm-title{text-align:center;font-family:'Syne',sans-serif;font-weight:600;font-size:15px;margin-bottom:6px}
+.confirm-text{text-align:center;font-size:13px;color:var(--muted);line-height:1.6}
+.btn-cancel{padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:white;font-size:13px;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-cancel:hover{background:var(--bg)}
+.btn-confirm-delete{padding:8px 16px;border-radius:7px;background:var(--danger);border:none;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-confirm-delete:hover{background:#881f1f}
+.btn-send{padding:8px 16px;border-radius:7px;background:var(--accent);border:none;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-send:hover{background:#245740}
+
+/* ── SCANNING ── */
+.scanning-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;gap:16px;text-align:center}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scanning-text{font-size:14px;color:var(--muted)}
+
+/* ── ALERTS ── */
+.alert{border-radius:8px;padding:11px 14px;font-size:13px;display:flex;align-items:flex-start;gap:9px}
+.alert-warn{background:var(--warn-light);color:var(--warn)}
+.alert-ok{background:var(--accent-light);color:var(--accent)}
+.alert-info{background:var(--info-light);color:var(--info)}
+
+.empty-state{padding:32px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ── HIBP ── */
+.hibp-row{padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.hibp-row:last-child{border-bottom:none}
+.breach-icon{font-size:18px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN (shown when not connected) ══ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div class="logo-dot"><svg viewBox="0 0 16 16"><path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 2.2l4.5 2.3L8 7.8 3.5 5.5 8 3.2z"/></svg></div>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px">MailSécure</span>
+      </div>
+      <div class="login-title">Connexion à Gmail</div>
+      <div class="login-sub">Connectez-vous pour analyser et nettoyer votre boîte mail. Vos identifiants ne quittent jamais votre ordinateur.</div>
+      <div class="info-box">
+        🔑 Gmail nécessite un <strong>mot de passe d'application</strong> (pas votre mot de passe habituel).<br>
+        <a href="https://myaccount.google.com/apppasswords" target="_blank">→ Créer un mot de passe d'application Google</a>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Adresse Gmail</label>
+        <input class="form-input" type="email" id="login-email" placeholder="vous@gmail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe d'application (16 caractères)</label>
+        <input class="form-input" type="password" id="login-pass" placeholder="xxxx xxxx xxxx xxxx" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">Se connecter</button>
+      <div class="err-msg" id="login-err"></div>
+      <div style="margin-top:14px;font-size:11px;color:var(--soft);line-height:1.6">
+        🔒 Connexion locale uniquement via IMAP — aucune donnée n'est envoyée à des serveurs tiers.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP (shown when connected) ══ -->
+<div id="app-screen" style="display:none">
+
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-dot"><svg viewBox="0 0 16 16"><path d="M8 1L1 4.5v7L8 15l7-3.5v-7L8 1zm0 2.2l4.5 2.3L8 7.8 3.5 5.5 8 3.2z"/></svg></div>
+      MailSécure
+    </div>
+    <div class="topbar-right">
+      <div class="email-badge" id="topbar-email">✓ —</div>
+      <button class="btn-sm btn-danger-sm" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" id="nav-0" onclick="showTab(0)">Tableau de bord</button>
+    <button class="nav-btn" id="nav-1" onclick="showTab(1)">Expéditeurs <span class="badge" id="badge-co">0</span></button>
+    <button class="nav-btn" id="nav-2" onclick="showTab(2)">Nettoyage mails <span class="badge" id="badge-mails">0</span></button>
+    <button class="nav-btn" id="nav-3" onclick="showTab(3)">Fuites de données</button>
+    <button class="nav-btn" id="nav-4" onclick="showTab(4)">Historique RGPD</button>
+  </div>
+
+  <div class="main">
+
+    <!-- TAB 0 : DASHBOARD -->
+    <div class="section visible" id="tab-0">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Analyse de votre boîte Gmail</div>
+          <button class="btn-action" onclick="doScan()">🔄 Lancer l'analyse</button>
+        </div>
+        <div id="scan-area">
+          <div class="empty-state">Cliquez sur "Lancer l'analyse" pour scanner vos derniers mails.</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="stats-grid" style="display:none">
+        <div class="stat-card">
+          <div class="stat-label">Mails analysés</div>
+          <div class="stat-value" id="st-total">—</div>
+          <div class="stat-sub">derniers mails</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Newsletters & Spam</div>
+          <div class="stat-value" id="st-junk">—</div>
+          <div class="stat-sub">mails à trier</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Expéditeurs uniques</div>
+          <div class="stat-value" id="st-co">—</div>
+          <div class="stat-sub">domaines détectés</div>
+        </div>
+      </div>
+
+      <div id="quick-actions" style="display:none;flex-direction:column;gap:8px">
+        <button class="btn-action" style="padding:13px 16px;border-radius:10px;font-size:13px;width:100%;text-align:left;display:flex;gap:10px;align-items:center" onclick="showTab(1)">
+          <span style="font-size:18px">🏢</span>
+          <div><div style="font-weight:500">Voir les expéditeurs détectés</div><div style="font-size:11px;color:var(--muted)">Envoyer des demandes de suppression RGPD</div></div>
+          <span style="margin-left:auto">›</span>
+        </button>
+        <button class="btn-action" style="padding:13px 16px;border-radius:10px;font-size:13px;width:100%;text-align:left;display:flex;gap:10px;align-items:center" onclick="showTab(2)">
+          <span style="font-size:18px">🗑️</span>
+          <div><div style="font-weight:500">Nettoyer les mails inutiles</div><div style="font-size:11px;color:var(--muted)">Sélectionner et supprimer en masse</div></div>
+          <span style="margin-left:auto">›</span>
+        </button>
+        <button class="btn-action" style="padding:13px 16px;border-radius:10px;font-size:13px;width:100%;text-align:left;display:flex;gap:10px;align-items:center" onclick="showTab(3)">
+          <span style="font-size:18px">🔍</span>
+          <div><div style="font-weight:500">Vérifier les fuites de données</div><div style="font-size:11px;color:var(--muted)">Rechercher mon email dans les bases piratées</div></div>
+          <span style="margin-left:auto">›</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1 : COMPANIES -->
+    <div class="section" id="tab-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Expéditeurs qui ont votre email</div>
+          <div class="card-count" id="co-count">0 détectés</div>
+        </div>
+        <div class="search-wrap">
+          <input type="text" placeholder="Rechercher un expéditeur..." oninput="filterCo(this.value)">
+        </div>
+        <div id="company-list"><div class="empty-state">Lancez d'abord une analyse depuis le tableau de bord.</div></div>
+      </div>
+    </div>
+
+    <!-- TAB 2 : MAILS -->
+    <div class="section" id="tab-2">
+      <div class="action-bar">
+        <div class="action-bar-info"><strong id="checked-count">0</strong> mail(s) sélectionné(s)</div>
+        <div class="action-bar-btns">
+          <button class="btn-outline" onclick="selectAll()">Tout sélectionner</button>
+          <button class="btn-outline" onclick="deselectAll()">Désélectionner</button>
+          <button class="btn-delete" id="btn-del" disabled onclick="confirmDelete()">🗑 Supprimer la sélection</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Mails triés automatiquement</div>
+          <div class="card-count" id="mail-count">0 mails</div>
+        </div>
+        <div class="filter-bar">
+          <button class="chip active" onclick="filterMails('all',this)">Tous</button>
+          <button class="chip" onclick="filterMails('newsletter',this)">📨 Newsletters</button>
+          <button class="chip" onclick="filterMails('spam',this)">🚫 Spam</button>
+          <button class="chip" onclick="filterMails('important',this)">✅ Importants</button>
+          <button class="chip" onclick="filterMails('autre',this)">📁 Autres</button>
+        </div>
+        <div id="mail-list"><div class="empty-state">Lancez d'abord une analyse depuis le tableau de bord.</div></div>
+      </div>
+    </div>
+
+    <!-- TAB 3 : HIBP -->
+    <div class="section" id="tab-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Vérification des fuites de données</div>
+          <button class="btn-action" onclick="checkHIBP()">🔍 Vérifier maintenant</button>
+        </div>
+        <div id="hibp-area">
+          <div class="empty-state">Cliquez sur "Vérifier maintenant" pour chercher si votre email figure dans des bases piratées connues (Have I Been Pwned).</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Comment se protéger après une fuite ?</div></div>
+        <div style="padding:16px;font-size:13px;line-height:1.8;color:var(--muted)">
+          <div>1. <strong style="color:var(--text)">Changez votre mot de passe</strong> sur le service concerné immédiatement.</div>
+          <div>2. <strong style="color:var(--text)">Activez la double authentification</strong> (2FA) partout où c'est possible.</div>
+          <div>3. <strong style="color:var(--text)">Envoyez une demande RGPD</strong> à l'entreprise concernée via l'onglet "Expéditeurs".</div>
+          <div>4. <strong style="color:var(--text)">Signalez à la CNIL</strong> si l'entreprise ne répond pas sous 30 jours : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" style="color:var(--info)">cnil.fr/plaintes</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4 : HISTORY -->
+    <div class="section" id="tab-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Historique des demandes RGPD envoyées</div>
+          <div class="card-count" id="hist-count">0 demandes</div>
+        </div>
+        <div id="history-list"><div class="empty-state">Aucune demande envoyée pour l'instant.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODAL RGPD ══ -->
+<div class="overlay" id="gdpr-overlay">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <div class="modal-title">Demande de suppression RGPD</div>
+      <button class="btn-close" onclick="closeOverlay('gdpr-overlay')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="rgpd-note">📋 Conforme à l'article 17 du RGPD (droit à l'effacement). Modifiez le texte si nécessaire avant envoi.</div>
+      <div class="form-group">
+        <label class="form-label">Destinataire</label>
+        <input class="form-input" type="email" id="gdpr-to">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Objet</label>
+        <input class="form-input" id="gdpr-subject">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message (modifiable)</label>
+        <textarea class="form-textarea" id="gdpr-body"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeOverlay('gdpr-overlay')">Annuler</button>
+      <button class="btn-send" onclick="sendGDPR()">📤 Envoyer la demande</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMATION SUPPRESSION ══ -->
+<div class="overlay" id="confirm-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">Confirmer la suppression</div>
+      <button class="btn-close" onclick="closeOverlay('confirm-overlay')">×</button>
+    </div>
+    <div class="modal-body" style="padding:24px 18px">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title" id="conf-title">Supprimer les mails ?</div>
+      <div class="confirm-text" id="conf-text">Cette action est irréversible.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeOverlay('confirm-overlay')">Non, annuler</button>
+      <button class="btn-confirm-delete" onclick="doDelete()">Oui, supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let allMails = [];
+let allCompanies = [];
+let checkedUids = new Set();
+let activeCat = 'all';
+let gdprCompany = null;
+let gdprHistory = [];
+
+// ── AUTH ──
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const btn = document.getElementById('btn-login');
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Connexion en cours...';
+  try {
+    const r = await fetch('/api/connect', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pass})});
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      document.getElementById('topbar-email').textContent = '✓ ' + d.email;
+      loadHistory();
+    } else {
+      err.textContent = d.error;
+      err.style.display = 'block';
+    }
+  } catch(e) {
+    err.textContent = 'Erreur réseau : ' + e.message;
+    err.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Se connecter';
+}
+
+async function doLogout() {
+  await fetch('/api/disconnect', {method:'POST'});
+  location.reload();
+}
+
+// ── TABS ──
+function showTab(i) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('tab-' + i).classList.add('visible');
+  document.querySelectorAll('.nav-btn').forEach((b,j) => b.classList.toggle('active', j===i));
+}
+
+// ── SCAN ──
+async function doScan() {
+  const area = document.getElementById('scan-area');
+  area.innerHTML = '<div class="scanning-wrap"><div class="spinner"></div><div class="scanning-text">Analyse en cours… Connexion à Gmail via IMAP…</div></div>';
+  document.getElementById('stats-grid').style.display = 'none';
+  document.getElementById('quick-actions').style.display = 'none';
+
+  try {
+    const r = await fetch('/api/scan_mails', {method:'POST'});
+    const d = await r.json();
+    if (!d.success) {
+      area.innerHTML = `<div class="empty-state" style="color:var(--danger)">Erreur : ${d.error}</div>`;
+      return;
+    }
+    allMails = d.mails;
+    allCompanies = d.companies;
+    const s = d.stats;
+
+    area.innerHTML = `<div class="alert alert-ok" style="margin:14px 16px">✅ Analyse terminée — ${s.total} mails analysés, ${s.companies} expéditeurs uniques détectés.</div>`;
+
+    document.getElementById('st-total').textContent = s.total;
+    document.getElementById('st-junk').textContent = s.newsletter + s.spam;
+    document.getElementById('st-co').textContent = s.companies;
+    document.getElementById('stats-grid').style.display = 'grid';
+    document.getElementById('quick-actions').style.display = 'flex';
+
+    document.getElementById('badge-co').textContent = allCompanies.length;
+    document.getElementById('badge-mails').textContent = allMails.length;
+    document.getElementById('co-count').textContent = allCompanies.length + ' détectés';
+    document.getElementById('mail-count').textContent = allMails.length + ' mails';
+
+    renderCompanies(allCompanies);
+    renderMails(allMails);
+  } catch(e) {
+    area.innerHTML = `<div class="empty-state" style="color:var(--danger)">Erreur réseau : ${e.message}</div>`;
+  }
+}
+
+// ── COMPANIES ──
+function renderCompanies(list) {
+  const el = document.getElementById('company-list');
+  if (!list.length) { el.innerHTML = '<div class="empty-state">Aucun expéditeur trouvé.</div>'; return; }
+  el.innerHTML = list.map((c, i) => `
+    <div class="company-row">
+      <div class="avatar">${c.domain.substring(0,2).toUpperCase()}</div>
+      <div class="company-info">
+        <div class="company-name">${c.name || c.domain}</div>
+        <div class="company-sub">${c.count} mail(s) · ${c.domain}</div>
+      </div>
+      <span class="tag tag-email">Email</span>
+      <button class="btn-action" onclick='openGDPR(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Demander suppression</button>
+    </div>
+  `).join('');
+}
+
+function filterCo(q) {
+  const list = allCompanies.filter(c => (c.name+c.domain).toLowerCase().includes(q.toLowerCase()));
+  renderCompanies(list);
+}
+
+// ── MAILS ──
+function renderMails(list) {
+  const el = document.getElementById('mail-list');
+  if (!list.length) { el.innerHTML = '<div class="empty-state">Aucun mail dans cette catégorie.</div>'; return; }
+  el.innerHTML = list.map(m => `
+    <div class="mail-row${checkedUids.has(m.uid)?' selected':''}" onclick="toggleMail('${m.uid}',this)">
+      <div class="check${checkedUids.has(m.uid)?' on'}">${checkedUids.has(m.uid)?'✓':''}</div>
+      <span class="cat-pill cat-${m.category}">${m.category==='newsletter'?'Newsletter':m.category==='spam'?'Spam':m.category==='important'?'Important':'Autre'}</span>
+      <div class="mail-meta">
+        <div class="mail-from">${m.sender}</div>
+        <div class="mail-subj">${m.subject}</div>
+      </div>
+      <div class="mail-date">${m.date}</div>
+    </div>
+  `).join('');
+}
+
+function filterMails(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('#tab-2 .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const list = cat === 'all' ? allMails : allMails.filter(m => m.category === cat);
+  renderMails(list);
+}
+
+function toggleMail(uid, row) {
+  if (checkedUids.has(uid)) checkedUids.delete(uid);
+  else checkedUids.add(uid);
+  row.classList.toggle('selected');
+  const chk = row.querySelector('.check');
+  chk.classList.toggle('on');
+  chk.textContent = checkedUids.has(uid) ? '✓' : '';
+  updateBar();
+}
+
+function updateBar() {
+  const n = checkedUids.size;
+  document.getElementById('checked-count').textContent = n;
+  document.getElementById('btn-del').disabled = n === 0;
+}
+
+function selectAll() {
+  const list = activeCat === 'all' ? allMails : allMails.filter(m => m.category === activeCat);
+  list.forEach(m => checkedUids.add(m.uid));
+  renderMails(list);
+  updateBar();
+}
+
+function deselectAll() {
+  checkedUids.clear();
+  const list = activeCat === 'all' ? allMails : allMails.filter(m => m.category === activeCat);
+  renderMails(list);
+  updateBar();
+}
+
+function confirmDelete() {
+  const n = checkedUids.size;
+  document.getElementById('conf-title').textContent = `Supprimer ${n} mail(s) ?`;
+  document.getElementById('conf-text').textContent = `Vous êtes sur le point de supprimer définitivement ${n} mail(s). Voulez-vous continuer ?`;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+async function doDelete() {
+  closeOverlay('confirm-overlay');
+  const uids = Array.from(checkedUids);
+  try {
+    const r = await fetch('/api/delete_mails', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uids})});
+    const d = await r.json();
+    if (d.success) {
+      allMails = allMails.filter(m => !checkedUids.has(m.uid));
+      checkedUids.clear();
+      updateBar();
+      filterMails(activeCat, document.querySelector('#tab-2 .chip.active'));
+      document.getElementById('badge-mails').textContent = allMails.length;
+      alert(`✅ ${d.deleted} mail(s) supprimés avec succès !`);
+    } else {
+      alert('Erreur : ' + d.error);
+    }
+  } catch(e) {
+    alert('Erreur réseau : ' + e.message);
+  }
+}
+
+// ── HIBP ──
+async function checkHIBP() {
+  const area = document.getElementById('hibp-area');
+  area.innerHTML = '<div class="scanning-wrap"><div class="spinner"></div><div class="scanning-text">Recherche dans les bases de fuites connues…</div></div>';
+  try {
+    const r = await fetch('/api/check_hibp', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({})});
+    const d = await r.json();
+    if (!d.success) { area.innerHTML = `<div class="empty-state" style="color:var(--danger)">${d.error}</div>`; return; }
+    if (d.need_key) {
+      area.innerHTML = `<div class="alert alert-info" style="margin:14px 16px">ℹ️ ${d.message}<br><br>
+        Pour une vérification complète, créez une clé API gratuite sur <a href="https://haveibeenpwned.com/API/Key" target="_blank">haveibeenpwned.com</a> et relancez l'application avec la variable <code>HIBP_KEY=votre_clé</code>.</div>`;
+      return;
+    }
+    if (d.breaches.length === 0) {
+      area.innerHTML = '<div class="alert alert-ok" style="margin:14px 16px">✅ Bonne nouvelle ! Votre email ne figure dans aucune fuite de données connue.</div>';
+    } else {
+      area.innerHTML = `
+        <div class="alert alert-warn" style="margin:14px 16px">⚠️ Votre email a été trouvé dans <strong>${d.breaches.length} fuite(s)</strong> de données.</div>
+        ${d.breaches.map(b => `
+          <div class="hibp-row">
+            <span class="breach-icon">⚠️</span>
+            <div style="flex:1"><div style="font-weight:500;font-size:13px">${b.name}</div><div style="font-size:11px;color:var(--muted)">Fuite du ${b.date} · ${(b.count/1e6).toFixed(1)}M de comptes</div></div>
+            <button class="btn-action" onclick="openGDPRDomain('${b.name.toLowerCase().replace(/\s/g,'')}.com','${b.name}')">Demander suppression</button>
+          </div>
+        `).join('')}
+      `;
+    }
+  } catch(e) {
+    area.innerHTML = `<div class="empty-state" style="color:var(--danger)">Erreur : ${e.message}</div>`;
+  }
+}
+
+// ── GDPR ──
+function openGDPR(company) {
+  gdprCompany = company;
+  const emailAddr = document.getElementById('topbar-email').textContent.replace('✓ ','');
+  document.getElementById('gdpr-to').value = company.contact || `dpo@${company.domain}`;
+  document.getElementById('gdpr-subject').value = 'Demande d\'effacement de données personnelles – Art. 17 RGPD';
+  document.getElementById('gdpr-body').value =
+`Madame, Monsieur,
+
+En vertu du Règlement Général sur la Protection des Données (RGPD), et plus précisément de son article 17 relatif au droit à l'effacement (« droit à l'oubli »), je vous adresse par la présente une demande formelle d'effacement de l'ensemble de mes données personnelles.
+
+Adresse email concernée : ${emailAddr}
+
+Je vous demande de bien vouloir :
+1. Supprimer intégralement mes données personnelles de vos bases de données
+2. Cesser tout traitement de mes données personnelles
+3. Me confirmer par écrit l'exécution de cette demande dans les meilleurs délais
+
+Conformément au RGPD (article 12), vous disposez d'un mois pour répondre à cette demande. Passé ce délai, je me réserve le droit de saisir la CNIL.
+
+Dans l'attente de votre réponse, je vous adresse mes cordiales salutations.`;
+  document.getElementById('gdpr-overlay').classList.add('open');
+}
+
+function openGDPRDomain(domain, name) {
+  openGDPR({domain, name, contact: `dpo@${domain}`, count: 0});
+}
+
+async function sendGDPR() {
+  const to = document.getElementById('gdpr-to').value;
+  const subject = document.getElementById('gdpr-subject').value;
+  const body = document.getElementById('gdpr-body').value;
+  const btn = document.querySelector('#gdpr-overlay .btn-send');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+  try {
+    const r = await fetch('/api/send_gdpr', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to, subject, body})});
+    const d = await r.json();
+    if (d.success) {
+      closeOverlay('gdpr-overlay');
+      alert('✅ Demande RGPD envoyée avec succès à ' + to);
+      loadHistory();
+    } else {
+      alert('Erreur d\'envoi : ' + d.error);
+    }
+  } catch(e) {
+    alert('Erreur réseau : ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = '📤 Envoyer la demande';
+}
+
+// ── HISTORY ──
+async function loadHistory() {
+  const r = await fetch('/api/history');
+  const d = await r.json();
+  gdprHistory = d.history;
+  const el = document.getElementById('history-list');
+  document.getElementById('hist-count').textContent = gdprHistory.length + ' demandes';
+  if (!gdprHistory.length) { el.innerHTML = '<div class="empty-state">Aucune demande envoyée pour l\'instant.</div>'; return; }
+  el.innerHTML = gdprHistory.reverse().map(h => `
+    <div class="history-row">
+      <div class="hdot hdot-sent"></div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:500">${h.to}</div>
+        <div style="font-size:11px;color:var(--muted)">${h.date}</div>
+      </div>
+      <span class="status-pill st-ok">${h.status}</span>
+    </div>
+  `).join('');
+}
+
+// ── OVERLAYS ──
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── INIT ──
+fetch('/api/status').then(r=>r.json()).then(d => {
+  if (d.connected) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('topbar-email').textContent = '✓ ' + d.email;
+    loadHistory();
+  }
+});
+</script>
+</body>
+</html>
