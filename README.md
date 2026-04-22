@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MailSécure 🛡️
 
 Application web locale pour nettoyer et sécuriser sa boîte Gmail.
@@ -82,3 +83,7 @@ Paramètres Gmail → Voir tous les paramètres → Transfert et POP/IMAP → Ac
 ---
 
 *MailSécure — Application locale, open source, sans tracking.*
+=======
+# mailsecure
+Application web locale pour nettoyer et sécuriser sa boîte Gmail. Fonctionne sur tous les systèmes Linux.
+>>>>>>> 8b21b7106b16c062a362cda6043d043875711faa
